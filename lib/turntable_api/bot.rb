@@ -19,17 +19,10 @@ module TurntableAPI
       #@ws = Websocker::Client.new(:host => "localhost", :port => 8887, :logger => @logger)
       @ws.connect
       @ws.on_message do |msg|
-        puts "received: #{msg}"
-        if msg == "~m~10~m~no_session"
-          authenticate
-        elsif msg =~ /~m~[0-9]+~m~(~h~[0-9]+)/
-          # heartbeat
-          hb = $1
-          send_text(hb)
-        end
+        on_message msg
       end
       @ws.on_closed do
-        puts "Closed!"
+        on_closed
       end
       listener_thread = @ws.listen
     end
@@ -38,11 +31,24 @@ module TurntableAPI
       command = meth.to_s.sub('_', '.')
       hash = args[0] unless args.empty?
       hash ||= {}
-      puts "#{command}: #{hash}"
       call_api command, hash
     end
 
     private
+    
+    def on_message(msg)
+      if msg == "~m~10~m~no_session"
+        authenticate
+      elsif msg =~ /~m~[0-9]+~m~(~h~[0-9]+)/
+        # heartbeat
+        hb = $1
+        send_text(hb)
+      end
+    end
+    
+    def on_closed
+      puts "Closed!"
+    end
 
     def authenticate
       call_api "user.authenticate"
@@ -58,7 +64,10 @@ module TurntableAPI
     
     def send_text(txt)
       msg = "~m~#{txt.length}~m~#{txt}"
-      puts "sending: #{msg}"
+      send_raw(msg)
+    end
+    
+    def send_raw(msg)
       @ws.send(msg)
     end
     

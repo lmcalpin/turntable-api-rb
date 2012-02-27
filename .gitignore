@@ -1,3 +1,5 @@
 .buildpath
 .project
+*.gem
 test
+spec/reports

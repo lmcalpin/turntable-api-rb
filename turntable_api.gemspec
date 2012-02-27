@@ -12,4 +12,7 @@ Gem::Specification.new do |s|
   s.description = %q{A simple API for making Turntable.fm bots.}
   s.rubyforge_project = "turntable_api"
   s.add_dependency "websocker"
+  s.add_dependency "json"
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "rake"
 end

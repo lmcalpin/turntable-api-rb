@@ -2,11 +2,15 @@ PATH
   remote: .
   specs:
     turntable_api (0.0.1)
+      json
+      websocker
 
 GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.3)
+    json (1.6.5)
+    rake (0.8.7)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
       rspec-expectations (~> 2.8.0)
@@ -15,10 +19,12 @@ GEM
     rspec-expectations (2.8.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.8.0)
+    websocker (0.0.3)
 
 PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  rspec (>= 2.7)
+  rake
+  rspec
   turntable_api!
