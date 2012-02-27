@@ -20,23 +20,23 @@ refer to my {Scala version of this API}[https://github.com/lmcalpin/turntable-ap
 
 Actions:
 
-room_register, :roomid - go to a different room
-room_list_rooms - lists available rooms
-room_info - returns info about the current room
-user_info - returns info about your profile
-user_info, :userid - returns info about the specified userid
-user_become_fan, :userid - fans a user
-user_remove_fan, :userid - unfans a user
-room_speak, :text - say something
-user_modify, :name - change your name
-user_set_avatar, :avatarid - change your avatar
-user_modify, :laptop - change your laptop logo
-room_add_dj, :roomid - dj
-room_rem_dj, :roomid - stop djing
-room_boot_user, :roomid, :target_userid, :reason - boot a user
-room_vote, :val, :vh:, :ph - awesome or lame the current song
- # voting requires an SHA-1 hash of:
-  val = hash(roomid + direction ['up' or 'down'] + songid)
-  vh and ph can take hashes of a random number
-
-  
+*   room_register, :roomid - go to a different room
+    room_list_rooms - lists available rooms
+    room_info - returns info about the current room
+    user_info - returns info about your profile
+    user_info, :userid - returns info about the specified userid
+    user_become_fan, :userid - fans a user
+    user_remove_fan, :userid - unfans a user
+    room_speak, :text - say something
+    user_modify, :name - change your name
+    user_set_avatar, :avatarid - change your avatar
+    user_modify, :laptop - change your laptop logo
+    room_add_dj, :roomid - dj
+    room_rem_dj, :roomid - stop djing
+    room_boot_user, :roomid, :target_userid, :reason - boot a user
+    room_vote, :val, :vh:, :ph - awesome or lame the current song
+     # voting requires an SHA-1 hash of:
+      val = hash(roomid + direction ['up' or 'down'] + songid)
+      vh and ph can take hashes of a random number
+    
+      
