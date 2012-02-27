@@ -1,0 +1,19 @@
+= Turntable API
+
+This is an API for creating {Turntable FM}[http://turntable.fm/] bots with Ruby. It was 
+created using the Turntable API developed by {Alain Gilbert}[https://github.com/alaingilbert/Turntable-API] as a reference.
+
+Example:
+
+    bot = TurntableAPI::Bot.new(:auth => "YOURAUTHID", :userid => "YOURUSERID", :logger => logger,
+        :roomid => '4df1058699968e6b8a00168d')
+    thrd = bot.start
+    
+    # to call the API, call the action (replacing any '.' with '_') as a method and pass hash arguments
+    # for any additional parameter required by that API 
+    bot.room_speak :text => 'hi' 
+    bot.user_modify :name => 'mybotsnewname'
+    thrd.join
+    
+This is currently incomplete.  To get an idea of the available action you can invoke using the API, you should
+refer to the {Scala version of this API}[https://github.com/lmcalpin/turntable-api-scala], which is complete.
