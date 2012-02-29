@@ -6,7 +6,7 @@ created using the Turntable API developed by {Alain Gilbert}[https://github.com/
 Example:
 
   bot = TurntableAPI::Bot.new(:auth => "YOURAUTHID", :userid => "YOURUSERID", :logger => logger,
-  :roomid => '4df1058699968e6b8a00168d')
+      :roomid => '4df1058699968e6b8a00168d')
   thrd = bot.start
  
   # to call the API, call the action (replacing any '.' with '_') as a method and pass hash arguments
@@ -38,4 +38,30 @@ Actions:
   *   val = hash(roomid + direction ['up' or 'down'] + songid) 
   *   vh and ph can take hashes of a random number
  
-   
+You can also listen on events from the server using the on_command method:
+
+    bot.on_command(:speak) do
+      name = cmd['name']
+      # don't respond to yourself!!!
+      if name != '@mybotname'
+        bot.room_speak :text => "Hello, #{name}"
+      end
+    end
+
+Events you can listen on include:
+
+* snagged: when a user snags your song
+* registered: sent when someone joins the current room
+* deregistered: sent when someone leaves the room
+* add_dj: sent when someone steps up to DJ
+* rem_dj: sent when someone steps down from their turntable
+* newsong: sent whenever the song changes
+* update_votes: sent whenever someone awesomes or lames a song
+
+TODO
+
+Currently unfinished:
+
+* helper methods for voting a song up or down
+* we are currently pinned to a single chat server which means many rooms won't work
+ 
