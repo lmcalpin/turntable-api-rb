@@ -9,16 +9,14 @@ module TurntableAPI
       @clientid = opts[:clientid] || "#{Time.now.to_i}-#{rand}"
       @auth = opts[:auth]
       @logger = opts[:logger] || Logger.new(STDOUT)
-      @logger.level = Logger::INFO
-      @roomid = opts[:roomid]
       @msgId = 0
       @command_handlers ||= {}
+      @received_heartbeat = false
     end
 
     def start
+      # TODO chatserver needs to be determined dynamically
       @ws = Websocker::Client.new(:host => "chat2.turntable.fm", :path => "/socket.io/websocket", :logger => @logger)
-      # for testing...
-      #@ws = Websocker::Client.new(:host => "localhost", :port => 8887, :logger => @logger)
       @ws.connect
       @ws.on_message do |msg|
         on_message msg
@@ -27,6 +25,12 @@ module TurntableAPI
         on_closed
       end
       listener_thread = @ws.listen
+    end
+    
+    def room_register(roomid)
+      if roomid.instance_of?(Hash) then roomid = roomid[:roomid] end
+      @roomid = roomid
+      call_api 'room.register', :roomid => roomid
     end
     
     def method_missing(meth, *args, &block)
@@ -40,22 +44,33 @@ module TurntableAPI
     def on_command(command, &block)
       @command_handlers[command.to_sym] = block
     end
+    
+    def on_ready(&block)
+      @ready_handler = block
+    end
+    
+    def on_error(&block)
+      @error_handler = block
+    end
 
     def on_message(msg)
       if msg == "~m~10~m~no_session"
         authenticate
       elsif msg =~ /~m~[0-9]+~m~(~h~[0-9]+)/
-        # heartbeat
         hb = $1
+        @ready_handler.call unless @received_heartbeat or @ready_handler.nil?
+        @received_heartbeat = true
         send_text(hb)
       else
         msg =~ /~m~\d*~m~(\{.*\})/
         json = JSON.parse($1)
         command = json["command"]
-        @logger.debug "Looking up command handler for #{command} in #{json}"
-        block = @command_handlers[command.to_sym]
-        @logger.debug "Found #{@command_handlers}"
-        block.call(json) unless block.nil?
+        err = json["err"]
+        @error_handler.call(err) unless @error_handler.nil? or err.nil?
+        unless command.nil?
+          block = @command_handlers[command.to_sym]
+          block.call(json) unless block.nil?
+        end
       end
     end
     

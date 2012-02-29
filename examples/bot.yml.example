@@ -1,0 +1,4 @@
+# get these values using the Turntable API bookmarklet by Alain Gilbert: http://alaingilbert.github.com/Turntable-API/bookmarklet.html
+bot:
+  auth: yourauth
+  userid: youruserid
