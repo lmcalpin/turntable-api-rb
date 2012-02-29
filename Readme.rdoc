@@ -13,10 +13,8 @@ Example:
   # for any additional parameter required by that API 
   bot.room_speak :text => 'hi' 
   bot.user_modify :name => 'mybotsnewname'
-  thrd.join
- 
-This is currently incomplete.  To get an idea of the available actions you can invoke using the API, you should
-refer to my {Scala version of this API}[https://github.com/lmcalpin/turntable-api-scala], which is complete.
+
+Example bots can be found in the examples folder.
 
 = Actions
 
@@ -41,7 +39,7 @@ refer to my {Scala version of this API}[https://github.com/lmcalpin/turntable-ap
 = Events
 
 You can also listen on events from the server using the on_command method (so named because Turntable.FM is sending a command
-to the client, and that is what it is called in the json payload we receive from the server.)
+to the client, and that is what it is called in the json payload we receive from the serverg.)
 
     bot.on_command(:speak) do
       name = cmd['name']
