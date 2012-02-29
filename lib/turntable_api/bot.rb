@@ -9,8 +9,10 @@ module TurntableAPI
       @clientid = opts[:clientid] || "#{Time.now.to_i}-#{rand}"
       @auth = opts[:auth]
       @logger = opts[:logger] || Logger.new(STDOUT)
+      @logger.level = Logger::INFO
       @roomid = opts[:roomid]
       @msgId = 0
+      @command_handlers ||= {}
     end
 
     def start
@@ -28,14 +30,17 @@ module TurntableAPI
     end
     
     def method_missing(meth, *args, &block)
+      @logger.debug "method_missing #{meth}: #{args}"
       command = meth.to_s.sub('_', '.')
       hash = args[0] unless args.empty?
       hash ||= {}
       call_api command, hash
     end
-
-    private
     
+    def on_command(command, &block)
+      @command_handlers[command.to_sym] = block
+    end
+
     def on_message(msg)
       if msg == "~m~10~m~no_session"
         authenticate
@@ -43,8 +48,18 @@ module TurntableAPI
         # heartbeat
         hb = $1
         send_text(hb)
+      else
+        msg =~ /~m~\d*~m~(\{.*\})/
+        json = JSON.parse($1)
+        command = json["command"]
+        @logger.debug "Looking up command handler for #{command} in #{json}"
+        block = @command_handlers[command.to_sym]
+        @logger.debug "Found #{@command_handlers}"
+        block.call(json) unless block.nil?
       end
     end
+    
+    private
     
     def on_closed
       puts "Closed!"
@@ -54,12 +69,12 @@ module TurntableAPI
       call_api "user.authenticate"
     end
 
-    def call_api(api, params={})
+    def call_api(api, addl_params={})
       messageId = next_message_id
-      json = { 'api' => api, 'userid' => @userid, 'clientid' => @clientid, 'userauth' => @auth, 'msgid' => messageId }
-      json['roomid'] = @roomid if @roomid
-      json.merge!(params)
-      send_text(json.to_json)
+      params = { 'api' => api, 'userid' => @userid, 'clientid' => @clientid, 'userauth' => @auth, 'msgid' => messageId }
+      params['roomid'] = @roomid if @roomid
+      params.merge!(addl_params)
+      send_text(params.to_json)
     end
     
     def send_text(txt)
