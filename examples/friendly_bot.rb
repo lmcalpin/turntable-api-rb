@@ -22,8 +22,14 @@ bot.on_command(:speak) do |cmd|
   end
 end
 
+# upvote every new song that plays
+bot.on_command(:newsong) do |cmd|
+  bot.vote :val => 'up' # or 'down'
+end
+
 # join the /industrial room
 bot.room_register :roomid => '4df1058699968e6b8a00168d'
+
 while bot.connected()
   puts '.'
   sleep(5000)

@@ -16,6 +16,7 @@ module TurntableAPI
       @logger = opts[:logger] || Logger.new(STDOUT)
       @msgId = 0
       @command_handlers ||= {}
+      @response_handler ||= {}
       @received_heartbeat = false
     end
 
@@ -31,24 +32,49 @@ module TurntableAPI
       @roomid = roomid
     end
     
-    def method_missing(meth, *args, &block)
+    def room_vote(opts)
+      dir = opts[:val]
+      songid = on_response(:room_info) do |reply|
+        songid = reply['room']['metadata']['current_song']['_id']
+        opts[:vh] ||= hash("#{@roomid}#{dir}#{songid}")
+        opts[:th] ||= hash(rand.to_s)
+        opts[:ph] ||= hash(rand.to_s)
+        send_command('room_vote', opts)
+      end
+    end
+    alias_method :vote, :room_vote
+    
+    # sends a command and sets up a callback that triggers
+    # when the reply is received
+    def on_response(cmd, opts={}, &blk)
+      msg_id = send_command cmd, opts
+      @response_handler[msg_id] = blk
+    end
+    
+    def method_missing(meth, *args)
       @logger.debug "method_missing #{meth}: #{args}"
-      command = meth.to_s.sub('_', '.')
       hash = args[0] unless args.empty?
       hash ||= {}
-      call_api command, hash
+      send_command(meth, hash)
     end
     
-    def on_command(command, &block)
-      @command_handlers[command.to_sym] = block
+    # send a command to Turntable.FM
+    def send_command(command, opts={})
+      command = command.to_s.sub('_', '.')
+      call_api(command, opts)
     end
     
-    def on_ready(&block)
-      @ready_handler = block
+    # triggered when we receive a command from Turntable.FM
+    def on_command(command, &blk)
+      @command_handlers[command.to_sym] = blk
     end
     
-    def on_error(&block)
-      @error_handler = block
+    def on_ready(&blk)
+      @ready_handler = blk
+    end
+    
+    def on_error(&blk)
+      @error_handler = blk
     end
 
     def on_message(msg)
@@ -64,10 +90,16 @@ module TurntableAPI
         json = JSON.parse($1)
         command = json["command"]
         err = json["err"]
+        msgid = json["msgid"]
         @error_handler.call(err) unless @error_handler.nil? or err.nil?
         unless command.nil?
-          block = @command_handlers[command.to_sym]
-          block.call(json) unless block.nil?
+          blk = @command_handlers[command.to_sym]
+          blk.call(json) unless blk.nil?
+        end
+        unless @response_handler[msgid].nil?()
+          blk = @response_handler[msgid]
+          blk.call(json) unless blk.nil?
+          @response_handler.delete(msgid)
         end
       end
     end
@@ -102,6 +134,7 @@ module TurntableAPI
       params['roomid'] = @roomid if @roomid
       params.merge!(addl_params)
       send_text(params.to_json)
+      return messageId
     end
     
     def send_text(txt)
@@ -118,7 +151,6 @@ module TurntableAPI
     end
     
     def hash(msg)
-      puts msg
       Digest::SHA1.hexdigest(msg)
     end
     

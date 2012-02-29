@@ -18,7 +18,7 @@ Example:
 This is currently incomplete.  To get an idea of the available actions you can invoke using the API, you should
 refer to my {Scala version of this API}[https://github.com/lmcalpin/turntable-api-scala], which is complete.
 
-Actions:
+= Actions
 
 * room_register, :roomid - go to a different room
 * room_list_rooms - lists available rooms
@@ -38,7 +38,10 @@ Actions:
   *   val = hash(roomid + direction ['up' or 'down'] + songid) 
   *   vh and ph can take hashes of a random number
  
-You can also listen on events from the server using the on_command method:
+= Events
+
+You can also listen on events from the server using the on_command method (so named because Turntable.FM is sending a command
+to the client, and that is what it is called in the json payload we receive from the server.)
 
     bot.on_command(:speak) do
       name = cmd['name']
@@ -48,8 +51,6 @@ You can also listen on events from the server using the on_command method:
       end
     end
 
-Events you can listen on include:
-
 * snagged: when a user snags your song
 * registered: sent when someone joins the current room
 * deregistered: sent when someone leaves the room
@@ -57,11 +58,5 @@ Events you can listen on include:
 * rem_dj: sent when someone steps down from their turntable
 * newsong: sent whenever the song changes
 * update_votes: sent whenever someone awesomes or lames a song
-
-TODO
-
-Currently unfinished:
-
-* helper methods for voting a song up or down
 
  
