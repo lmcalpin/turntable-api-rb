@@ -9,9 +9,7 @@ logger = Logger.new(STDOUT)
 logger.level = Logger::DEBUG
 
 yaml = YAML.load_file(File.join(File.dirname(__FILE__), 'bot.yml'))
-puts yaml
 creds = yaml['bot']
-puts creds
 bot = TurntableAPI::Bot.new(:auth => creds['auth'], :userid => creds['userid'], :logger => logger)
 thrd = bot.start
 
