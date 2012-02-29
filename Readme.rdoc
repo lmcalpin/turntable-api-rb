@@ -63,5 +63,5 @@ TODO
 Currently unfinished:
 
 * helper methods for voting a song up or down
-* we are currently pinned to a single chat server which means many rooms won't work
+
  

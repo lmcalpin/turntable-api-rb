@@ -11,7 +11,8 @@ logger.level = Logger::DEBUG
 yaml = YAML.load_file(File.join(File.dirname(__FILE__), 'bot.yml'))
 creds = yaml['bot']
 bot = TurntableAPI::Bot.new(:auth => creds['auth'], :userid => creds['userid'], :logger => logger)
-thrd = bot.start
+
+bot.start
 
 # if anyone speaks, say hello
 bot.on_command(:speak) do |cmd|
@@ -23,4 +24,7 @@ end
 
 # join the /industrial room
 bot.room_register :roomid => '4df1058699968e6b8a00168d'
-thrd.join
+while bot.connected()
+  puts '.'
+  sleep(5000)
+end

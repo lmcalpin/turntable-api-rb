@@ -1,9 +1,14 @@
 require 'rubygems'
 require 'websocker'
 require 'json'
+require 'digest/sha1'
 
 module TurntableAPI
   class Bot
+    attr_reader :connected
+    
+    CHATSERVERS = ["chat2.turntable.fm", "chat3.turntable.fm"]
+    
     def initialize(opts = {})
       @userid = opts[:userid]
       @clientid = opts[:clientid] || "#{Time.now.to_i}-#{rand}"
@@ -15,22 +20,15 @@ module TurntableAPI
     end
 
     def start
-      # TODO chatserver needs to be determined dynamically
-      @ws = Websocker::Client.new(:host => "chat2.turntable.fm", :path => "/socket.io/websocket", :logger => @logger)
-      @ws.connect
-      @ws.on_message do |msg|
-        on_message msg
-      end
-      @ws.on_closed do
-        on_closed
-      end
-      listener_thread = @ws.listen
+      connect
     end
     
     def room_register(roomid)
+      @ws.close unless @ws.nil?
       if roomid.instance_of?(Hash) then roomid = roomid[:roomid] end
-      @roomid = roomid
+      connect(roomid)
       call_api 'room.register', :roomid => roomid
+      @roomid = roomid
     end
     
     def method_missing(meth, *args, &block)
@@ -76,8 +74,22 @@ module TurntableAPI
     
     private
     
+    def connect(roomid='unknown')
+      @ws = Websocker::Client.new(:host => chatserver(roomid), :path => "/socket.io/websocket", :logger => @logger)
+      @ws.connect
+      @ws.on_message do |msg|
+        on_message msg
+      end
+      @ws.on_closed do
+        on_closed
+      end
+      @listener_thread = @ws.listen
+      @connected = true
+    end
+    
     def on_closed
-      puts "Closed!"
+      @connected = false
+      Thread.kill(@listener_thread) unless @listener_thread.nil?
     end
 
     def authenticate
@@ -104,6 +116,17 @@ module TurntableAPI
     def next_message_id
       @msgId += 1
     end
+    
+    def hash(msg)
+      puts msg
+      Digest::SHA1.hexdigest(msg)
+    end
+    
+    def chatserver(roomid)
+      c = 0
+      hash(roomid).each_byte do |i| c += i.to_i end
+      return CHATSERVERS[c % CHATSERVERS.size]
+    end  
   end
 
 end
