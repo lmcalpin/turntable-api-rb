@@ -2,3 +2,4 @@
 bot:
   auth: yourauth
   userid: youruserid
+  name: yourbotsname

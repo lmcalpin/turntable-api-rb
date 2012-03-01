@@ -10,14 +10,15 @@ logger.level = Logger::DEBUG
 
 yaml = YAML.load_file(File.join(File.dirname(__FILE__), 'bot.yml'))
 creds = yaml['bot']
+myname = creds['name']
 bot = TurntableAPI::Bot.new(:auth => creds['auth'], :userid => creds['userid'], :logger => logger)
 
 bot.start
 
 # if anyone speaks, say hello
 bot.on_command(:registered) do |cmd|
-  name = cmd['name']
-  if name != '@@@'
+  name = cmd['user'][0]['name']
+  unless name == myname
     text = "Hello, #{name}"
     bot.room_speak :text => text
   end
@@ -29,8 +30,8 @@ bot.on_command(:newsong) do |cmd|
   bot.vote :val => 'up', :songid => songid
 end
 
-# join the /industrial room 
-bot.room_register :roomid => '4df1058699968e6b8a00168d'
+# join a room 
+bot.room_register :roomid => '4f4f938fa3f7517d61003ae7'
 
 while bot.connected()
   puts '.'
