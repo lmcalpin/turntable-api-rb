@@ -15,22 +15,26 @@ bot = TurntableAPI::Bot.new(:auth => creds['auth'], :userid => creds['userid'], 
 bot.start
 
 # if anyone speaks, say hello
-bot.on_command(:speak) do |cmd|
+bot.on_command(:registered) do |cmd|
   name = cmd['name']
-  if name != '@mybotname'
-    bot.room_speak :text => "Hello, #{name}"
+  if name != '@@@'
+    text = "Hello, #{name}"
+    bot.room_speak :text => text
   end
 end
 
 # upvote every new song that plays
 bot.on_command(:newsong) do |cmd|
-  bot.vote :val => 'up' # or 'down'
+  songid = cmd['room']['metadata']['current_song']['_id']
+  bot.vote :val => 'up', :songid => songid
 end
 
-# join the /industrial room
+# join the /industrial room 
 bot.room_register :roomid => '4df1058699968e6b8a00168d'
 
 while bot.connected()
   puts '.'
-  sleep(5000)
+  sleep(50)
 end
+
+puts "Done"

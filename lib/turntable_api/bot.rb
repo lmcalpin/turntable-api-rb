@@ -34,13 +34,12 @@ module TurntableAPI
     
     def room_vote(opts)
       dir = opts[:val]
-      songid = on_response(:room_info) do |reply|
-        songid = reply['room']['metadata']['current_song']['_id']
-        opts[:vh] ||= hash("#{@roomid}#{dir}#{songid}")
-        opts[:th] ||= hash(rand.to_s)
-        opts[:ph] ||= hash(rand.to_s)
-        send_command('room_vote', opts)
-      end
+      songid = opts[:songid]
+      raise ArgumentError, "dir and songid are required" if songid.nil? or dir.nil?
+      opts[:vh] ||= hash("#{@roomid}#{dir}#{songid}")
+      opts[:th] ||= hash(rand.to_s)
+      opts[:ph] ||= hash(rand.to_s)
+      send_command('room_vote', opts)
     end
     alias_method :vote, :room_vote
     
@@ -78,6 +77,7 @@ module TurntableAPI
     end
 
     def on_message(msg)
+      @logger.debug "Received: #{msg}"
       if msg == "~m~10~m~no_session"
         authenticate
       elsif msg =~ /~m~[0-9]+~m~(~h~[0-9]+)/
@@ -107,7 +107,7 @@ module TurntableAPI
     private
     
     def connect(roomid='unknown')
-      @ws = Websocker::Client.new(:host => chatserver(roomid), :path => "/socket.io/websocket", :logger => @logger)
+      @ws = Websocker::Client.new(:host => chatserver(roomid), :path => "/socket.io/websocket")
       @ws.connect
       @ws.on_message do |msg|
         on_message msg
@@ -143,6 +143,7 @@ module TurntableAPI
     end
     
     def send_raw(msg)
+      @logger.debug "Sent: #{msg}"
       @ws.send(msg)
     end
     
