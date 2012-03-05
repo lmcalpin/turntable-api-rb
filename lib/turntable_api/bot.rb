@@ -5,7 +5,7 @@ require 'digest/sha1'
 
 module TurntableAPI
   class Bot
-    attr_reader :connected
+    attr_reader :connected, :roomid
     
     CHATSERVERS = ["chat2.turntable.fm", "chat3.turntable.fm"]
     

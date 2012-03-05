@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe TurntableAPI::Bot do
-  before(:all) do
+  before(:each) do
     @bot = TurntableAPI::Bot.new :userid => 'user', :auth => 'auth', :clientid => 'clientid'
   end
 
@@ -11,7 +11,13 @@ describe TurntableAPI::Bot do
     @bot.room_speak :text => 'hi'
   end
 
-  it "should invoke a block if we registered a callback for a command" do
+  it "should keep track of the current room" do
+    @bot.stub!(:send_raw)
+    @bot.room_register :roomid => 'abcdefg'
+    @bot.roomid.should eq('abcdefg')
+  end
+
+  it "should invoke a block if we registered a callback for an action" do
     # register a callback for the 'speak' command
     @bot.on_command(:speak) do |cmd|
       @text = cmd['text']
@@ -29,7 +35,7 @@ describe TurntableAPI::Bot do
     end
     it "should attempt to establish a session" do
       @bot.stub!(:send_raw)
-      @bot.should_receive(:send_raw).with('~m~93~m~{"api":"user.authenticate","msgid":2,"userid":"user","clientid":"clientid","userauth":"auth"}')
+      @bot.should_receive(:send_raw).with('~m~93~m~{"api":"user.authenticate","msgid":1,"userid":"user","clientid":"clientid","userauth":"auth"}')
       @bot.start
     end
   end
