@@ -15,7 +15,7 @@ bot = TurntableAPI::Bot.new(:auth => creds['auth'], :userid => creds['userid'], 
 
 bot.start
 
-# if anyone speaks, say hello
+# if anyone comes into the room, say hello
 bot.on_command(:registered) do |cmd|
   name = cmd['user'][0]['name']
   unless name == myname
