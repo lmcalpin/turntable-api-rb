@@ -7,7 +7,7 @@ Example:
 
   bot = TurntableAPI::Bot.new(:auth => "YOURAUTHID", :userid => "YOURUSERID", :logger => logger,
       :roomid => '4df1058699968e6b8a00168d')
-  thrd = bot.start
+  bot.start
  
   # to call the API, call the action (replacing any '.' with '_') as a method and pass hash arguments
   # for any additional parameter required by that API 
