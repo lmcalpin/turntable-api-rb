@@ -2,12 +2,11 @@ require 'rubygems'
 require 'websocker'
 require 'json'
 require 'digest/sha1'
+require 'httparty'
 
 module TurntableAPI
   class Bot
     attr_reader :connected, :roomid
-    
-    CHATSERVERS = ["chat2.turntable.fm", "chat3.turntable.fm"]
     
     def initialize(opts = {})
       @userid = opts[:userid]
@@ -156,9 +155,8 @@ module TurntableAPI
     end
     
     def chatserver(roomid)
-      c = 0
-      hash(roomid).each_byte do |i| c += i.to_i end
-      return CHATSERVERS[c % CHATSERVERS.size]
+      resp = HTTParty.get("http://turntable.fm/api/room.which_chatserver?roomid=#{roomid}").body
+      JSON.parse(resp)[1]["chatserver"][0]
     end  
   end
 

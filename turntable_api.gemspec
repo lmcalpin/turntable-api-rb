@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "turntable_api"
   s.add_dependency "websocker"
   s.add_dependency "json"
+  s.add_dependency "httparty"
   s.add_development_dependency "rspec"
   s.add_development_dependency "rake"
 end

@@ -24,11 +24,13 @@ bot.on_command(:registered) do |cmd|
   end
 end
 
+# turntable does not allow autobop; this is just an example on how to use the API
+# http://faq.turntable.fm/customer/portal/articles/258935
 # upvote every new song that plays
-bot.on_command(:newsong) do |cmd|
-  songid = cmd['room']['metadata']['current_song']['_id']
-  bot.vote :val => 'up', :songid => songid
-end
+#bot.on_command(:newsong) do |cmd|
+#  songid = cmd['room']['metadata']['current_song']['_id']
+#  bot.vote :val => 'up', :songid => songid
+#end
 
 # join a room 
 bot.room_register :roomid => '4f4f938fa3f7517d61003ae7'
