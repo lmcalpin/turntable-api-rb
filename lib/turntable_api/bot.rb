@@ -76,7 +76,6 @@ module TurntableAPI
     end
 
     def on_message(msg)
-      @logger.debug "Received: #{msg}"
       if msg == "~m~10~m~no_session"
         authenticate
       elsif msg =~ /~m~[0-9]+~m~(~h~[0-9]+)/

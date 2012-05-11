@@ -25,9 +25,9 @@ bot.on_command(:speak) do |cmd|
         song = info["room"]["metadata"]["current_song"]
         unless song.nil?
             begin
-                artist = song["metadata"]["artist"]
+                artist = URI.escape(song["metadata"]["artist"])
                 # look up similar artists on last.fm
-                body = HTTParty.get("http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=assemblage%2023&api_key=#{last_fm_api_key}&limit=15").body
+                body = HTTParty.get("http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=#{artist}&api_key=#{last_fm_api_key}&limit=15").body
                 doc = REXML::Document.new(body)
                 artists = doc.elements.collect('lfm/similarartists/artist/name') do |a|
                     a.text
@@ -46,6 +46,7 @@ end
 
 # join a room
 bot.room_register :roomid => '4df1058699968e6b8a00168d'
+#bot.room_register :roomid => '4e5582db14169c5e62324d64'
 
 while bot.connected()
   puts '.'
