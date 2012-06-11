@@ -11,6 +11,8 @@ Gem::Specification.new do |s|
   s.summary     = %q{API for creating Turntable bots.}
   s.description = %q{A simple API for making Turntable.fm bots.}
   s.rubyforge_project = "turntable_api"
+  s.files         = Dir.glob("{lib}/**/*")
+  s.require_paths = ["lib"]
   s.add_dependency "websocker"
   s.add_dependency "json"
   s.add_dependency "httparty"

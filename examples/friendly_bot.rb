@@ -1,8 +1,7 @@
-$:.push File.expand_path('../lib', File.dirname(__FILE__))
+#$:.push File.expand_path('../lib', File.dirname(__FILE__))
 
 require 'rubygems'
-require "turntable_api/version"
-require "turntable_api/bot"
+require 'turntable_api'
 require 'yaml'
 
 logger = Logger.new(STDOUT)
